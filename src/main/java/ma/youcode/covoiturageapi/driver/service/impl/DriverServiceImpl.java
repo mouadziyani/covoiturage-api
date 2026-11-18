@@ -56,4 +56,11 @@ public class DriverServiceImpl implements DriverService {
         return driverMapper.toResponse(createdDriver);
     }
 
+    @Override
+    public List<DriverResponseDto> findAll() {
+        return driverRepository.findAll().stream()
+                .map(driverMapper::toResponse)
+                .toList();
+    }
+
 }
