@@ -28,4 +28,9 @@ public class GlobalExceptionHandler {
         return build(HttpStatus.CONFLICT, "conflict", conflict.getMessage(),request);
     }
 
+    @ExceptionHandler(ForbiddenActionException.class)
+    public  ProblemDetail forbiddenAction(ForbiddenActionException forbiddenAction, HttpServletRequest request){
+        return build(HttpStatus.FORBIDDEN, "forbidden", forbiddenAction.getMessage(),request);
+    }
+
 }
