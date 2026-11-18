@@ -34,4 +34,8 @@ public class PassagerController {
         return ResponseEntity.ok(passagerService.findById(id));
     }
 
+    @PutMapping("/{id}")
+    public ResponseEntity<PassagerResponseDto> updatePassager(@PathVariable Long id, @Valid @RequestBody PassagerRequestDto dto) {
+        return ResponseEntity.ok(passagerService.update(id, dto));
+    }
 }
