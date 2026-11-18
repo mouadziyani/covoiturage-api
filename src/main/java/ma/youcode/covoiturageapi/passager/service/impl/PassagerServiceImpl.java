@@ -60,6 +60,14 @@ public class PassagerServiceImpl implements PassagerService {
 
     @Override
     public PassagerResponseDto update(Long id, PassagerRequestDto request) {
-        return null;
+        Passager passager = passagerRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("Passager with id : " + id + " not found"));
+
+        if (passagerRepository.existsByEmailAndIdNot(request.email(),id)) {
+            throw  new ConflictException("this email : " + request.email() + " already used by other driver");
+        }
+
+        passagerMapper.updateEntity(request , passager);
+        return passagerMapper.toResponse(passagerRepository.save(passager));
     }
 }
