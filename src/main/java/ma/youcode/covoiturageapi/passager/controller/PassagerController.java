@@ -29,4 +29,9 @@ public class PassagerController {
         return ResponseEntity.ok(passagerService.findAll());
     }
 
+    @GetMapping("/{id}")
+    public ResponseEntity<PassagerResponseDto> getPassagerById(@PathVariable Long id) {
+        return ResponseEntity.ok(passagerService.findById(id));
+    }
+
 }
