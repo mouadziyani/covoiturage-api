@@ -7,7 +7,12 @@ import ma.youcode.covoiturageapi.driver.mapper.DriverMapper;
 import ma.youcode.covoiturageapi.driver.repository.DriverRepository;
 import lombok.RequiredArgsConstructor;
 import ma.youcode.covoiturageapi.driver.service.inter.DriverService;
+import ma.youcode.covoiturageapi.exception.ConflictException;
+import ma.youcode.covoiturageapi.exception.NotFoundException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 @Service
 @Transactional
