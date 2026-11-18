@@ -4,6 +4,7 @@ import jakarta.validation.Valid;
 import ma.youcode.covoiturageapi.driver.dto.request.DriverRequestDto;
 import ma.youcode.covoiturageapi.driver.dto.response.DriverResponseDto;
 import ma.youcode.covoiturageapi.driver.service.inter.DriverService;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -20,13 +21,23 @@ public class DriverController {
     }
 
     @PostMapping
-    public DriverResponseDto createDriver(@Valid @RequestBody DriverRequestDto dto) {
-        return driverService.create(dto);
+    public ResponseEntity<DriverResponseDto> createDriver(@Valid @RequestBody DriverRequestDto dto) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(driverService.create(dto));
     }
 
     @GetMapping
-    public ResponseEntity<?> getAll(){
+    public ResponseEntity<List<DriverResponseDto>> getAll() {
         return ResponseEntity.ok(driverService.findAll());
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<DriverResponseDto> getDriverById(@PathVariable Long id) {
+        return ResponseEntity.ok(driverService.findById(id));
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<DriverResponseDto> updateDriver(@PathVariable Long id, @Valid @RequestBody DriverRequestDto dto) {
+        return ResponseEntity.ok(driverService.update(id, dto));
     }
 
     @GetMapping("/search")

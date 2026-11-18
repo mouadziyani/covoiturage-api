@@ -5,6 +5,7 @@ import ma.youcode.covoiturageapi.driver.dto.response.DriverResponseDto;
 import ma.youcode.covoiturageapi.driver.entity.Driver;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
+import org.mapstruct.MappingTarget;
 
 @Mapper(componentModel = "spring")
 public interface DriverMapper {

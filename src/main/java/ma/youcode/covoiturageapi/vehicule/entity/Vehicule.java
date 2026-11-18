@@ -22,7 +22,7 @@ public class Vehicule {
     private String color;
     @Column(nullable = false)
     private String size;
-    @ManyToMany(fetch = FetchType.LAZY)
-    @JoinColumn(name = "driver_id",nullable = false)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "driver_id", nullable = false)
     private Driver driver;
 }
