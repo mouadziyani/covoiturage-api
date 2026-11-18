@@ -47,7 +47,9 @@ public class PassagerServiceImpl implements PassagerService {
 
     @Override
     public PassagerResponseDto findById(Long id) {
-        return null;
+        Passager passager = passagerRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("Passager with id : " + id + " not found"));
+        return passagerMapper.toResponse(passager);
     }
 
     @Override
