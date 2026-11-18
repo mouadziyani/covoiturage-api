@@ -18,4 +18,9 @@ public class GlobalExceptionHandler {
         return build(HttpStatus.NOT_FOUND, "not found", notFound.getMessage(),request);
     }
 
+    @ExceptionHandler(InvalidRequestException.class)
+    public ProblemDetail invalidRequestHandler(InvalidRequestException invalidRequest , HttpServletRequest request){
+        return build(HttpStatus.BAD_REQUEST, "invalid request", invalidRequest.getMessage(),request);
+    }
+
 }
