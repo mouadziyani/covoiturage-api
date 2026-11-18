@@ -23,4 +23,10 @@ public class PassagerController {
     public ResponseEntity<PassagerResponseDto> createPassager(@Valid @RequestBody PassagerRequestDto dto) {
         return ResponseEntity.status(HttpStatus.CREATED).body(passagerService.create(dto));
     }
+
+    @GetMapping
+    public ResponseEntity<List<PassagerResponseDto>> getAll() {
+        return ResponseEntity.ok(passagerService.findAll());
+    }
+
 }
