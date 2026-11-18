@@ -33,4 +33,12 @@ public class GlobalExceptionHandler {
         return build(HttpStatus.FORBIDDEN, "forbidden", forbiddenAction.getMessage(),request);
     }
 
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ProblemDetail handleValidation(MethodArgumentNotValidException argumentNotValidException, HttpServletRequest request) {
+        String message = argumentNotValidException.getBindingResult().getFieldErrors().stream()
+                .map(e -> e.getField() + ": " + e.getDefaultMessage())
+                .collect(Collectors.joining("; "));
+        return build(HttpStatus.BAD_REQUEST, "validation-error", message, request);
+    }
+
 }
