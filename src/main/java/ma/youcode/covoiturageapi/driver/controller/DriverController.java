@@ -23,4 +23,9 @@ public class DriverController {
     public DriverResponseDto createDriver(@Valid @RequestBody DriverRequestDto dto) {
         return driverService.create(dto);
     }
+
+    @GetMapping
+    public ResponseEntity<?> getAll(){
+        return ResponseEntity.ok(driverService.findAll());
+    }
 }
