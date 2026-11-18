@@ -23,4 +23,9 @@ public class GlobalExceptionHandler {
         return build(HttpStatus.BAD_REQUEST, "invalid request", invalidRequest.getMessage(),request);
     }
 
+    @ExceptionHandler(ConflictException.class)
+    public  ProblemDetail conflictHandler(ConflictException conflict, HttpServletRequest request){
+        return build(HttpStatus.CONFLICT, "conflict", conflict.getMessage(),request);
+    }
+
 }
