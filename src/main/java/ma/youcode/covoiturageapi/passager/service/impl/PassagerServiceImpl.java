@@ -40,6 +40,9 @@ public class PassagerServiceImpl implements PassagerService {
     @Override
     public List<PassagerResponseDto> findAll() {
         return List.of();
+        return passagerRepository.findAll().stream()
+                .map(passagerMapper::toResponse)
+                .toList();
     }
 
     @Override
