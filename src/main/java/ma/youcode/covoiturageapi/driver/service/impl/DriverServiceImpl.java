@@ -89,4 +89,10 @@ public class DriverServiceImpl implements DriverService {
         return driverMapper.toResponse(driverRepository.save(driver));
     }
 
+    @Override
+    public List<DriverResponseDto> search(String word) {
+        return driverRepository.findByFirstNameContainingIgnoreCaseOrLastNameContainingIgnoreCaseOrEmailContainingIgnoreCase(word , word , word)
+                .stream().map(driverMapper::toResponse).toList();
+    }
+
 }
