@@ -28,4 +28,9 @@ public class DriverController {
     public ResponseEntity<?> getAll(){
         return ResponseEntity.ok(driverService.findAll());
     }
+
+    @GetMapping("/search")
+    public List<DriverResponseDto> search(@RequestParam String word) {
+        return driverService.search(word);
+    }
 }
