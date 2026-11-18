@@ -64,7 +64,7 @@ public class PassagerServiceImpl implements PassagerService {
                 .orElseThrow(() -> new NotFoundException("Passager with id : " + id + " not found"));
 
         if (passagerRepository.existsByEmailAndIdNot(request.email(),id)) {
-            throw  new ConflictException("this email : " + request.email() + " already used by other driver");
+            throw  new ConflictException("this email : " + request.email() + " already used by other passager");
         }
 
         passagerMapper.updateEntity(request , passager);
