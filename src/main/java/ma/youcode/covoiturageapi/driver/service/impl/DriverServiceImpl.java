@@ -70,4 +70,23 @@ public class DriverServiceImpl implements DriverService {
         return driverMapper.toResponse(driver);
     }
 
+    @Override
+    @Transactional
+    public DriverResponseDto update(Long id, DriverRequestDto request) {
+        Driver driver = driverRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("Driver with id : " + id + " not found"));
+
+        if (driverRepository.existsByEmailAndIdNot(request.email(),id)) {
+            throw  new ConflictException("this email : " + request.email() + " already used by other driver");
+        }
+
+        if (driverRepository.existsByDrivingLicenseNumberAndIdNot(request.drivingLicenseNumber(), id)) {
+            throw  new ConflictException("this Driving License Number : " + request.drivingLicenseNumber() + " already used by other driver");
+        }
+
+        driverMapper.updateEntity(request, driver);
+
+        return driverMapper.toResponse(driverRepository.save(driver));
+    }
+
 }
