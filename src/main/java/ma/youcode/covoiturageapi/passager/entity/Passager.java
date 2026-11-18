@@ -11,6 +11,9 @@ import ma.youcode.covoiturageapi.user.entity.User;
 @Table(name = "passagers")
 @Getter
 @Setter
+<<<<<<< Updated upstream
 @NoArgsConstructor
+=======
+>>>>>>> Stashed changes
 public class Passager extends User {
 }
