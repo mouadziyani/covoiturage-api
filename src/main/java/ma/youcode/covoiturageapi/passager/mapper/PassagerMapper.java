@@ -1,16 +1,22 @@
     package ma.youcode.covoiturageapi.passager.mapper;
 
+    import ma.youcode.covoiturageapi.driver.dto.request.DriverRequestDto;
+    import ma.youcode.covoiturageapi.driver.entity.Driver;
     import ma.youcode.covoiturageapi.passager.dto.request.PassagerRequestDto;
+    import ma.youcode.covoiturageapi.passager.dto.response.PassagerResponseDto;
     import ma.youcode.covoiturageapi.passager.entity.Passager;
     import org.mapstruct.Mapper;
     import org.mapstruct.Mapping;
+    import org.mapstruct.MappingTarget;
 
     @Mapper(componentModel = "spring")
     public interface PassagerMapper {
 
-        PassagerRequestDto toResponse(Passager passager);
+        PassagerResponseDto toResponse(Passager passager);
 
         @Mapping(target = "id", ignore = true)
         Passager toEntity(PassagerRequestDto dto);
 
+        @Mapping(target = "id",ignore = true)
+        Passager updateEntity(PassagerRequestDto dto , @MappingTarget Passager passager);
     }

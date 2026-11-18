@@ -1,7 +1,11 @@
 package ma.youcode.covoiturageapi.passager.service.impl;
 
+import ma.youcode.covoiturageapi.driver.entity.Driver;
+import ma.youcode.covoiturageapi.exception.ConflictException;
+import ma.youcode.covoiturageapi.exception.NotFoundException;
 import ma.youcode.covoiturageapi.passager.dto.request.PassagerRequestDto;
 import ma.youcode.covoiturageapi.passager.dto.response.PassagerResponseDto;
+import ma.youcode.covoiturageapi.passager.entity.Passager;
 import ma.youcode.covoiturageapi.passager.mapper.PassagerMapper;
 import ma.youcode.covoiturageapi.passager.repository.PassagerRepository;
 import ma.youcode.covoiturageapi.passager.service.inter.PassagerService;
@@ -24,26 +28,46 @@ public class PassagerServiceImpl implements PassagerService {
 
     @Override
     public PassagerResponseDto create(PassagerRequestDto request) {
-        return null;
+        if (passagerRepository.existsByEmail(request.email())) {
+            throw new ConflictException("this email : " + request.email() + " already exist");
+        }
+        Passager passager = passagerMapper.toEntity(request);
+        Passager saved = passagerRepository.save(passager);
+
+        return passagerMapper.toResponse(saved);
     }
 
     @Override
     public List<PassagerResponseDto> findAll() {
-        return List.of();
+        return passagerRepository.findAll().stream()
+                .map(passagerMapper::toResponse)
+                .toList();
     }
 
     @Override
     public PassagerResponseDto findById(Long id) {
-        return null;
+        Passager passager = passagerRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("Passager with id : " + id + " not found"));
+        return passagerMapper.toResponse(passager);
     }
 
     @Override
     public PassagerResponseDto findByEmail(String email) {
-        return null;
+        Passager passager = passagerRepository.findByEmail(email)
+                .orElseThrow(()->new  NotFoundException("Passager with email : " + email + " not found"));
+        return passagerMapper.toResponse(passager);
     }
 
     @Override
     public PassagerResponseDto update(Long id, PassagerRequestDto request) {
-        return null;
+        Passager passager = passagerRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("Passager with id : " + id + " not found"));
+
+        if (passagerRepository.existsByEmailAndIdNot(request.email(),id)) {
+            throw  new ConflictException("this email : " + request.email() + " already used by other driver");
+        }
+
+        passagerMapper.updateEntity(request , passager);
+        return passagerMapper.toResponse(passagerRepository.save(passager));
     }
 }
