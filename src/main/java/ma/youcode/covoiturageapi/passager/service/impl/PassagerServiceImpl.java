@@ -1,7 +1,11 @@
 package ma.youcode.covoiturageapi.passager.service.impl;
 
+import ma.youcode.covoiturageapi.driver.entity.Driver;
+import ma.youcode.covoiturageapi.exception.ConflictException;
+import ma.youcode.covoiturageapi.exception.NotFoundException;
 import ma.youcode.covoiturageapi.passager.dto.request.PassagerRequestDto;
 import ma.youcode.covoiturageapi.passager.dto.response.PassagerResponseDto;
+import ma.youcode.covoiturageapi.passager.entity.Passager;
 import ma.youcode.covoiturageapi.passager.mapper.PassagerMapper;
 import ma.youcode.covoiturageapi.passager.repository.PassagerRepository;
 import ma.youcode.covoiturageapi.passager.service.inter.PassagerService;
@@ -24,7 +28,13 @@ public class PassagerServiceImpl implements PassagerService {
 
     @Override
     public PassagerResponseDto create(PassagerRequestDto request) {
-        return null;
+        if (passagerRepository.existsByEmail(request.email())) {
+            throw new ConflictException("this email : " + request.email() + " already exist");
+        }
+        Passager passager = passagerMapper.toEntity(request);
+        Passager saved = passagerRepository.save(passager);
+
+        return passagerMapper.toResponse(saved);
     }
 
     @Override
