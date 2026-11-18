@@ -39,7 +39,6 @@ public class PassagerServiceImpl implements PassagerService {
 
     @Override
     public List<PassagerResponseDto> findAll() {
-        return List.of();
         return passagerRepository.findAll().stream()
                 .map(passagerMapper::toResponse)
                 .toList();
@@ -54,7 +53,9 @@ public class PassagerServiceImpl implements PassagerService {
 
     @Override
     public PassagerResponseDto findByEmail(String email) {
-        return null;
+        Passager passager = passagerRepository.findByEmail(email)
+                .orElseThrow(()->new  NotFoundException("Passager with email : " + email + " not found"));
+        return passagerMapper.toResponse(passager);
     }
 
     @Override
