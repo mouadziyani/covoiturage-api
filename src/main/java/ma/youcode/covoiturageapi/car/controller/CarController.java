@@ -39,4 +39,9 @@ public class CarController {
         return  ResponseEntity.status(HttpStatus.OK).body(carService.update(id, dto));
     }
 
+    @GetMapping("/drivers/{driverId}")
+    public  ResponseEntity<List<CarResponseDto>> getCarsByDriverId(@PathVariable Long driverId) {
+        return ResponseEntity.status(HttpStatus.OK).body(carService.getByDriverId(driverId));
+    }
+
 }
