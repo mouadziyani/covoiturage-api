@@ -83,4 +83,12 @@ public class CarServiceImp implements CarService {
                 .toList();
     }
 
+    @Override
+    public void delete(Long id) {
+        Car car = carRepository.findById(id)
+                .orElseThrow(()->new NotFoundException("Car with id : " + id + " not found"));
+
+        carRepository.delete(car);
+
+    }
 }
