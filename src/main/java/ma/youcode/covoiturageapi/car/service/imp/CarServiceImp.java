@@ -58,4 +58,19 @@ public class CarServiceImp implements CarService {
         return carMapper.toResponse(car);
     }
 
+    @Override
+    @Transactional
+    public CarResponseDto update(Long id, CarRequestDto request) {
+        Car car = carRepository.findById(id)
+                .orElseThrow(()->new NotFoundException("Car with id : " + id + " not found"));
+
+        if (carRepository.existsByRegistrationNumberAndIdNot(request.registrationNumber(), id)){
+            throw  new ConflictException("this Registration Number : " + request.registrationNumber() + " already used by other car");
+        }
+
+        carMapper.updateEntity(request, car);
+
+        return carMapper.toResponse(carRepository.save(car));
+    }
+
 }
