@@ -24,4 +24,9 @@ public class CarController {
         return ResponseEntity.status(HttpStatus.CREATED).body(carService.create(dto));
     }
 
+    @GetMapping
+    public ResponseEntity<List<CarResponseDto>> getAllCars() {
+        return  ResponseEntity.status(HttpStatus.OK).body(carService.getAll());
+    }
+
 }
