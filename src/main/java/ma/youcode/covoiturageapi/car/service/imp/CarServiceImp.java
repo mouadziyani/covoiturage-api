@@ -73,4 +73,14 @@ public class CarServiceImp implements CarService {
         return carMapper.toResponse(carRepository.save(car));
     }
 
+    @Override
+    public List<CarResponseDto> getByDriverId(Long driverId) {
+        if (!driverRepository.existsById(driverId)) {
+            throw new  NotFoundException("driver with id : " + driverId + " not found");
+        }
+        return carRepository.findByDriverId(driverId).stream()
+                .map(carMapper::toResponse)
+                .toList();
+    }
+
 }
