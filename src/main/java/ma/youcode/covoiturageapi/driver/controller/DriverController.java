@@ -27,17 +27,17 @@ public class DriverController {
 
     @GetMapping
     public ResponseEntity<List<DriverResponseDto>> getAll() {
-        return ResponseEntity.ok(driverService.findAll());
+        return ResponseEntity.status(HttpStatus.OK).body(driverService.findAll());
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<DriverResponseDto> getDriverById(@PathVariable Long id) {
-        return ResponseEntity.ok(driverService.findById(id));
+        return ResponseEntity.status(HttpStatus.OK).body(driverService.findById(id));
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<DriverResponseDto> updateDriver(@PathVariable Long id, @Valid @RequestBody DriverRequestDto dto) {
-        return ResponseEntity.ok(driverService.update(id, dto));
+        return ResponseEntity.status(HttpStatus.OK).body(driverService.update(id, dto));
     }
 
     @GetMapping("/search")

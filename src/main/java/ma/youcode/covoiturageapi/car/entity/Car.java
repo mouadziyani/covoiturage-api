@@ -1,4 +1,4 @@
-package ma.youcode.covoiturageapi.vehicule.entity;
+package ma.youcode.covoiturageapi.car.entity;
 
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -6,9 +6,9 @@ import lombok.Setter;
 import ma.youcode.covoiturageapi.driver.entity.Driver;
 
 @Entity
-@Table(name = "vehicules")
+@Table(name = "cars")
 @Getter @Setter
-public class Vehicule {
+public class Car {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id ;
