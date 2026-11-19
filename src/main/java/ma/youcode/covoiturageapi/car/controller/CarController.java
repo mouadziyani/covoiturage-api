@@ -29,4 +29,9 @@ public class CarController {
         return  ResponseEntity.status(HttpStatus.OK).body(carService.getAll());
     }
 
+    @GetMapping("/{id}")
+    public ResponseEntity<CarResponseDto> getCarById(@PathVariable Long id) {
+        return  ResponseEntity.status(HttpStatus.OK).body(carService.getById(id));
+    }
+
 }
