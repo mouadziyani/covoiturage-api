@@ -44,4 +44,11 @@ public class CarServiceImp implements CarService {
         return carMapper.toResponse(createCar);
     }
 
+    @Override
+    public List<CarResponseDto> getAll() {
+        return carRepository.findAll().stream()
+                .map(carMapper::toResponse)
+                .toList();
+    }
+
 }
