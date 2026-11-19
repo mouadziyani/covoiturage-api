@@ -51,4 +51,11 @@ public class CarServiceImp implements CarService {
                 .toList();
     }
 
+    @Override
+    public CarResponseDto getById(Long id) {
+        Car car = carRepository.findById(id)
+                .orElseThrow(()->new NotFoundException("Car with id : " + id + " not found"));
+        return carMapper.toResponse(car);
+    }
+
 }
