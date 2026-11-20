@@ -1,7 +1,5 @@
     package ma.youcode.covoiturageapi.passager.mapper;
 
-    import ma.youcode.covoiturageapi.driver.dto.request.DriverRequestDto;
-    import ma.youcode.covoiturageapi.driver.entity.Driver;
     import ma.youcode.covoiturageapi.passager.dto.request.PassagerRequestDto;
     import ma.youcode.covoiturageapi.passager.dto.response.PassagerResponseDto;
     import ma.youcode.covoiturageapi.passager.entity.Passager;
