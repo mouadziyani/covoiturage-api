@@ -4,6 +4,8 @@ import jakarta.validation.Valid;
 import ma.youcode.covoiturageapi.driver.dto.request.DriverRequestDto;
 import ma.youcode.covoiturageapi.driver.dto.response.DriverResponseDto;
 import ma.youcode.covoiturageapi.driver.service.inter.DriverService;
+import ma.youcode.covoiturageapi.trip.dto.response.TripResponseDto;
+import ma.youcode.covoiturageapi.trip.service.inter.TripService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -15,9 +17,11 @@ import java.util.List;
 public class DriverController {
 
     private final DriverService driverService;
+    private final TripService tripService;
 
-    public DriverController(DriverService driverService) {
+    public DriverController(DriverService driverService, TripService tripService) {
         this.driverService = driverService;
+        this.tripService = tripService;
     }
 
     @PostMapping
@@ -43,5 +47,10 @@ public class DriverController {
     @GetMapping("/search")
     public List<DriverResponseDto> search(@RequestParam String word) {
         return driverService.search(word);
+    }
+
+    @GetMapping("/{driverId}/trips")
+    public ResponseEntity<List<TripResponseDto>> getTripsByDriverId(@PathVariable Long driverId) {
+        return ResponseEntity.ok(tripService.getByDriverId(driverId));
     }
 }
