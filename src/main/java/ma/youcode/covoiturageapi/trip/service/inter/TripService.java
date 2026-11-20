@@ -19,5 +19,9 @@ public interface TripService {
 
     List<TripResponseDto> search(String departureCity, String arrivalCity, LocalDate date);
 
+    void complete(Long id);
+
+    void cancel(Long id);
+
     void delete(Long id);
 }
