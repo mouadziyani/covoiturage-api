@@ -26,4 +26,10 @@ public class TripController {
     public ResponseEntity<TripResponseDto> create(@Valid @RequestBody TripRequestDto dto) {
         return ResponseEntity.status(HttpStatus.CREATED).body(tripService.create(dto));
     }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<TripResponseDto> getById(@PathVariable Long id) {
+        return ResponseEntity.ok(tripService.getById(id));
+    }
+
 }
