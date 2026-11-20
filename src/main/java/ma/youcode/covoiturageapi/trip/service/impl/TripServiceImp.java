@@ -47,7 +47,8 @@ public class TripServiceImp implements TripService {
 
     @Override
     public TripResponseDto getById(Long id) {
-        return null;
+        Trip trip = tripRepository.findById(id).orElseThrow(() -> new NotFoundException("Trip with id : " + id + " not found"));
+        return tripMapper.toResponse(trip);
     }
 
     @Override
