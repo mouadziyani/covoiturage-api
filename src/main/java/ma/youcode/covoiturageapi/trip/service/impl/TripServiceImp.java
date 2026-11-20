@@ -53,7 +53,13 @@ public class TripServiceImp implements TripService {
 
     @Override
     public TripResponseDto update(Long id, TripRequestDto request) {
-        return null;
+        Trip trip = tripRepository.findById(id).orElseThrow(() -> new NotFoundException("Trip with id : " + id + " not found"));
+        Car car = carRepository.findById(request.carId()).orElseThrow(() -> new NotFoundException("Car with id : " + request.carId() + " not found"));
+
+        tripMapper.updateEntity(request, trip);
+        trip.setCar(car);
+
+        return tripMapper.toResponse(tripRepository.save(trip));
     }
 
     @Override
