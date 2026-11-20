@@ -79,6 +79,22 @@ public class TripServiceImp implements TripService {
     }
 
     @Override
+    public void complete(Long id) {
+        Trip trip = tripRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("Trip with id : " + id + " not found"));
+
+        if (trip.getStatus() != StatutTrajet.PUBLIE && trip.getStatus() != StatutTrajet.COMPLET) {
+            throw new ConflictException("Only a published or full trip can be completed");
+        }
+        if (trip.getDepartureDateTime().isAfter(LocalDateTime.now())) {
+            throw new ConflictException("A trip can only be completed after its departure time");
+        }
+
+        trip.setStatus(StatutTrajet.TERMINE);
+        tripRepository.save(trip);
+    }
+
+    @Override
     public void delete(Long id) {
         Trip trip = tripRepository.findById(id).orElseThrow(() -> new NotFoundException("Trip with id : " + id + " not found"));
         tripRepository.delete(trip);
