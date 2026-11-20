@@ -46,4 +46,9 @@ public class TripController {
         return ResponseEntity.noContent().build();
     }
 
+    @PatchMapping("/{id}/cancel")
+    public ResponseEntity<Void> cancel(@PathVariable Long id) {
+        tripService.cancel(id);
+        return ResponseEntity.noContent().build();
+    }
 }
