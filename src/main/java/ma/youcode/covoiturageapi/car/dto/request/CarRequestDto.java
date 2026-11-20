@@ -13,7 +13,7 @@ public record CarRequestDto(
         @NotBlank(message = "Color is required")
         String color,
         @NotBlank(message = "Size is required")
-        String size,
+        int size,
         @NotNull(message = "Driver ID is required")
         Long driverId) {
 }

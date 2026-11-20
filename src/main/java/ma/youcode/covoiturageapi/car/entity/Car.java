@@ -21,7 +21,7 @@ public class Car {
     @Column(nullable = false)
     private String color;
     @Column(nullable = false)
-    private String size;
+    private int size;
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "driver_id", nullable = false)
     private Driver driver;
