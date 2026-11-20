@@ -42,7 +42,7 @@ public class TripServiceImp implements TripService {
 
     @Override
     public List<TripResponseDto> getAll() {
-        return List.of();
+        return tripRepository.findAll().stream().map(tripMapper::toResponse).toList();
     }
 
     @Override
