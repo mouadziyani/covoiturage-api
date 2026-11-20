@@ -6,7 +6,7 @@ public record CarResponseDto(
         String model,
         String registrationNumber,
         String color,
-        String size,
+        int size,
         Long driverId
 ) {
 }
