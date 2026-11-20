@@ -1,6 +1,5 @@
 package ma.youcode.covoiturageapi.passager.service.impl;
 
-import ma.youcode.covoiturageapi.driver.entity.Driver;
 import ma.youcode.covoiturageapi.exception.ConflictException;
 import ma.youcode.covoiturageapi.exception.NotFoundException;
 import ma.youcode.covoiturageapi.passager.dto.request.PassagerRequestDto;
