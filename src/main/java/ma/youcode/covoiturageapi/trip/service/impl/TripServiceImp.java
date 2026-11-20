@@ -69,7 +69,11 @@ public class TripServiceImp implements TripService {
 
     @Override
     public List<TripResponseDto> search(String departureCity, String arrivalCity, LocalDate date) {
-        return List.of();
+        LocalDateTime startOfDay = date.atStartOfDay();
+        LocalDateTime endOfDay = date.plusDays(1).atStartOfDay().minusNanos(1);
+
+        return tripRepository.findByDepartureCityIgnoreCaseAndArrivalCityIgnoreCaseAndDepartureDateTimeBetween(departureCity, arrivalCity, startOfDay, endOfDay)
+                .stream().map(tripMapper::toResponse).toList();
     }
 
     @Override
