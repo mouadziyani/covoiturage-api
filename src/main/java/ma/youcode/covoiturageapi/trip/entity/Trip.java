@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import ma.youcode.covoiturageapi.car.entity.Car;
+import ma.youcode.covoiturageapi.driver.entity.Driver;
 import ma.youcode.covoiturageapi.enums.StatutTrajet;
 
 import java.time.LocalDateTime;
@@ -21,6 +22,10 @@ public class Trip {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "driver_id", nullable = false)
+    private Driver   driver;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "car_id", nullable = false)
