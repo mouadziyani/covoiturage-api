@@ -10,7 +10,6 @@ import ma.youcode.covoiturageapi.car.entity.Car;
 import ma.youcode.covoiturageapi.car.mappper.CarMapper;
 import ma.youcode.covoiturageapi.car.repository.CarRepository;
 import ma.youcode.covoiturageapi.car.service.inter.CarService;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 

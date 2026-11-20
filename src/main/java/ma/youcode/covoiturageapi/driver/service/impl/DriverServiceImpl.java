@@ -5,7 +5,6 @@ import ma.youcode.covoiturageapi.driver.dto.response.DriverResponseDto;
 import ma.youcode.covoiturageapi.driver.entity.Driver;
 import ma.youcode.covoiturageapi.driver.mapper.DriverMapper;
 import ma.youcode.covoiturageapi.driver.repository.DriverRepository;
-import lombok.RequiredArgsConstructor;
 import ma.youcode.covoiturageapi.driver.service.inter.DriverService;
 import ma.youcode.covoiturageapi.exception.ConflictException;
 import ma.youcode.covoiturageapi.exception.NotFoundException;
