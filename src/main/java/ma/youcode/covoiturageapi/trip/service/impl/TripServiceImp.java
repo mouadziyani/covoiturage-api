@@ -78,6 +78,7 @@ public class TripServiceImp implements TripService {
 
     @Override
     public void delete(Long id) {
-
+        Trip trip = tripRepository.findById(id).orElseThrow(() -> new NotFoundException("Trip with id : " + id + " not found"));
+        tripRepository.delete(trip);
     }
 }
