@@ -3,6 +3,8 @@ package ma.youcode.covoiturageapi.trip.service.impl;
 import ma.youcode.covoiturageapi.car.entity.Car;
 import ma.youcode.covoiturageapi.car.repository.CarRepository;
 import ma.youcode.covoiturageapi.exception.NotFoundException;
+import ma.youcode.covoiturageapi.exception.ConflictException;
+import ma.youcode.covoiturageapi.enums.StatutTrajet;
 import ma.youcode.covoiturageapi.trip.entity.Trip;
 import ma.youcode.covoiturageapi.trip.dto.request.TripRequestDto;
 import ma.youcode.covoiturageapi.trip.dto.response.TripResponseDto;
@@ -91,6 +93,19 @@ public class TripServiceImp implements TripService {
         }
 
         trip.setStatus(StatutTrajet.TERMINE);
+        tripRepository.save(trip);
+    }
+
+    @Override
+    public void cancel(Long id) {
+        Trip trip = tripRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("Trip with id : " + id + " not found"));
+
+        if (trip.getStatus() != StatutTrajet.PUBLIE && trip.getStatus() != StatutTrajet.COMPLET) {
+            throw new ConflictException("Only a published or full trip can be cancelled");
+        }
+
+        trip.setStatus(StatutTrajet.ANNULE);
         tripRepository.save(trip);
     }
 
