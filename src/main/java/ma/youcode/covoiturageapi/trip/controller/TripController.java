@@ -32,4 +32,12 @@ public class TripController {
         return ResponseEntity.ok(tripService.getById(id));
     }
 
+    @GetMapping("/search")
+    public ResponseEntity<List<TripResponseDto>> search(
+            @RequestParam String departureCity,
+            @RequestParam String arrivalCity,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date) {
+        return ResponseEntity.ok(tripService.search(departureCity, arrivalCity, date));
+    }
+
 }
