@@ -40,4 +40,10 @@ public class TripController {
         return ResponseEntity.ok(tripService.search(departureCity, arrivalCity, date));
     }
 
+    @PatchMapping("/{id}/complete")
+    public ResponseEntity<Void> complete(@PathVariable Long id) {
+        tripService.complete(id);
+        return ResponseEntity.noContent().build();
+    }
+
 }
