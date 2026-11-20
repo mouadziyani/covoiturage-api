@@ -64,7 +64,7 @@ public class TripServiceImp implements TripService {
 
     @Override
     public List<TripResponseDto> getByDriverId(Long driverId) {
-        return List.of();
+        return tripRepository.findByCarDriverId(driverId).stream().map(tripMapper::toResponse).toList();
     }
 
     @Override
