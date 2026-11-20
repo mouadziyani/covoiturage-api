@@ -36,6 +36,7 @@ public class TripServiceImp implements TripService {
 
         Trip trip = tripMapper.toEntity(request);
         trip.setCar(car);
+        trip.setDriver(car.getDriver());
 
         return tripMapper.toResponse(tripRepository.save(trip));
     }
@@ -58,6 +59,7 @@ public class TripServiceImp implements TripService {
 
         tripMapper.updateEntity(request, trip);
         trip.setCar(car);
+        trip.setDriver(car.getDriver());
 
         return tripMapper.toResponse(tripRepository.save(trip));
     }
