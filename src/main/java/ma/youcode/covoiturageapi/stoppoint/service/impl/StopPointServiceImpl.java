@@ -24,4 +24,14 @@ public class StopPointServiceImpl implements StopPointService {
         this.tripRepository = tripRepository;
         this.stopPointMapper = stopPointMapper;
     }
+
+    @Override
+    public List<StopPointResponseDto> getByTripId(Long tripId) {
+        if (!tripRepository.existsById(tripId)) {
+            throw new NotFoundException("Trip with id : " + tripId + " not found");
+        }
+        return stopPointRepository.findByTripIdOrderByStopOrderAsc(tripId).stream()
+                .map(stopPointMapper::toResponse)
+                .toList();
+    }
 }
