@@ -10,11 +10,17 @@ import org.mapstruct.MappingTarget;
 @Mapper(componentModel = "spring")
 public interface CarMapper {
 
+    @Mapping(target = "size", source = "size")
+    @Mapping(target = "driverId", source = "driver.id")
     CarResponseDto toResponse(Car car);
 
     @Mapping(target = "id", ignore = true)
+    @Mapping(target = "size", source = "size")
+    @Mapping(target = "driver", ignore = true)
     Car toEntity(CarRequestDto dto);
 
     @Mapping(target = "id", ignore = true)
+    @Mapping(target = "size", source = "size")
+    @Mapping(target = "driver", ignore = true)
     Car updateEntity(CarRequestDto dto , @MappingTarget Car car);
 }
