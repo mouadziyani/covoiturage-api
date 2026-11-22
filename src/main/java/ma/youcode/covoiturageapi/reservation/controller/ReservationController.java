@@ -24,4 +24,10 @@ public class ReservationController {
         return ResponseEntity.status(HttpStatus.CREATED).body(reservationService.create(request));
     }
 
+    @GetMapping("/{reservationId}")
+    public ResponseEntity<ReservationResponseDto> getById(@PathVariable Long reservationId,
+                                                          @RequestParam Long passagerId) {
+        return ResponseEntity.ok(reservationService.getById(reservationId, passagerId));
+    }
+
 }
