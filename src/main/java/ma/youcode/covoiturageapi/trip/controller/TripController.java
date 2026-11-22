@@ -10,7 +10,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
-import java.util.List;
+import java.math.BigDecimal;
+import ma.youcode.covoiturageapi.common.dto.PageResponse;
+import ma.youcode.covoiturageapi.trip.dto.response.TripSearchResultDto;
 
 @RestController
 @RequestMapping("api/trips")
@@ -33,22 +35,26 @@ public class TripController {
     }
 
     @GetMapping("/search")
-    public ResponseEntity<List<TripResponseDto>> search(
+    public ResponseEntity<PageResponse<TripSearchResultDto>> search(
             @RequestParam String departureCity,
             @RequestParam String arrivalCity,
-            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date) {
-        return ResponseEntity.ok(tripService.search(departureCity, arrivalCity, date));
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date,
+            @RequestParam(defaultValue = "1") Integer seats,
+            @RequestParam(required = false) BigDecimal maxPrice,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+        return ResponseEntity.ok(tripService.search(departureCity, arrivalCity, date, seats, maxPrice, page, size));
     }
 
     @PatchMapping("/{id}/complete")
-    public ResponseEntity<Void> complete(@PathVariable Long id) {
-        tripService.complete(id);
+    public ResponseEntity<Void> complete(@PathVariable Long id, @RequestParam Long driverId) {
+        tripService.complete(id, driverId);
         return ResponseEntity.noContent().build();
     }
 
     @PatchMapping("/{id}/cancel")
-    public ResponseEntity<Void> cancel(@PathVariable Long id) {
-        tripService.cancel(id);
+    public ResponseEntity<Void> cancel(@PathVariable Long id, @RequestParam Long driverId) {
+        tripService.cancel(id, driverId);
         return ResponseEntity.noContent().build();
     }
 }
