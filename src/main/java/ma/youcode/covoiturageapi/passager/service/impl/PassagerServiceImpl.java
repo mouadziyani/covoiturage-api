@@ -10,12 +10,15 @@ import ma.youcode.covoiturageapi.passager.repository.PassagerRepository;
 import ma.youcode.covoiturageapi.passager.service.inter.PassagerService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.List;
 
 @Service
 @Transactional
 public class PassagerServiceImpl implements PassagerService {
+    private static final Logger logger = LoggerFactory.getLogger(PassagerServiceImpl.class);
 
     private final PassagerRepository passagerRepository;
     private final PassagerMapper passagerMapper;
@@ -28,10 +31,12 @@ public class PassagerServiceImpl implements PassagerService {
     @Override
     public PassagerResponseDto create(PassagerRequestDto request) {
         if (passagerRepository.existsByEmail(request.email())) {
+            logger.warn("Passenger creation rejected: email is already used");
             throw new ConflictException("this email : " + request.email() + " already exist");
         }
         Passager passager = passagerMapper.toEntity(request);
         Passager saved = passagerRepository.save(passager);
+        logger.info("Passenger account {} created", saved.getId());
 
         return passagerMapper.toResponse(saved);
     }
@@ -63,10 +68,13 @@ public class PassagerServiceImpl implements PassagerService {
                 .orElseThrow(() -> new NotFoundException("Passager with id : " + id + " not found"));
 
         if (passagerRepository.existsByEmailAndIdNot(request.email(),id)) {
+            logger.warn("Passenger update rejected: email is already used for passenger {}", id);
             throw  new ConflictException("this email : " + request.email() + " already used by other passager");
         }
 
         passagerMapper.updateEntity(request , passager);
-        return passagerMapper.toResponse(passagerRepository.save(passager));
+        Passager updatedPassager = passagerRepository.save(passager);
+        logger.info("Passenger account {} updated", updatedPassager.getId());
+        return passagerMapper.toResponse(updatedPassager);
     }
 }
