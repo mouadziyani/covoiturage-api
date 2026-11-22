@@ -35,4 +35,9 @@ public class ReservationController {
         return ResponseEntity.ok(reservationService.getByPassagerId(passagerId));
     }
 
+    @GetMapping("/driver/{driverId}")
+    public ResponseEntity<List<ReservationResponseDto>> getByDriverId(@PathVariable Long driverId) {
+        return ResponseEntity.ok(reservationService.getByDriverId(driverId));
+    }
+
 }
