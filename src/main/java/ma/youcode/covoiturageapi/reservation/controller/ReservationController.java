@@ -30,4 +30,9 @@ public class ReservationController {
         return ResponseEntity.ok(reservationService.getById(reservationId, passagerId));
     }
 
+    @GetMapping("/passager/{passagerId}")
+    public ResponseEntity<List<ReservationResponseDto>> getByPassagerId(@PathVariable Long passagerId) {
+        return ResponseEntity.ok(reservationService.getByPassagerId(passagerId));
+    }
+
 }
