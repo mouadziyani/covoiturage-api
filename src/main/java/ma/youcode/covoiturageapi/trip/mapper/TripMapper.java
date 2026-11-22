@@ -13,10 +13,7 @@ public interface TripMapper {
 
     @Mapping(target = "carId", source = "trip.car.id")
     @Mapping(target = "driverId", source = "trip.driver.id")
-    @Mapping(
-            target = "remainingSeats",
-            expression = "java(trip.getProposedSeats() - reservedSeats.intValue())"
-    )
+    @Mapping(target = "remainingSeats", expression = "java(Math.max(0, trip.getProposedSeats() - reservedSeats.intValue()))")
     TripResponseDto toResponse(Trip trip, Long reservedSeats);
 
     @Mapping(target = "id", ignore = true)
