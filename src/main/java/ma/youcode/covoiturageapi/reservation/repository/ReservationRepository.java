@@ -19,6 +19,8 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
 
     Optional<Reservation> findByIdAndPassagerId(Long id, Long passagerId);
 
+    Optional<Reservation> findByIdAndPassagerIdAndStatus(Long id, Long passagerId, StatutReservation status);
+
     @Query("select coalesce(sum(r.numberOfSeats), 0) from Reservation r where r.trip.id = :tripId and r.status = :status")
     Long sumSeatsByTripAndStatus(@Param("tripId") Long tripId, @Param("status") StatutReservation status);
 
