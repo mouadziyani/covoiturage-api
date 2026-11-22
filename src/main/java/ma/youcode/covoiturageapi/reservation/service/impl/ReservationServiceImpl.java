@@ -105,4 +105,17 @@ public class ReservationServiceImpl implements ReservationService {
         return reservationMapper.toResponse(saved);
     }
 
+    @Override
+    @Transactional(readOnly = true)
+    public ReservationResponseDto getById(Long reservationId, Long passagerId) {
+        Reservation reservation = reservationRepository.findById(reservationId)
+                .orElseThrow(() -> new NotFoundException("Reservation not found"));
+        if (!reservation.getPassager().getId().equals(passagerId)) {
+            logger.warn("Reservation access rejected: passenger {} does not own reservation {}",
+                    passagerId, reservationId);
+            throw new ForbiddenActionException("This reservation belongs to another passenger");
+        }
+        return reservationMapper.toResponse(reservation);
+    }
+
 }
