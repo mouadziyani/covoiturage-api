@@ -8,7 +8,6 @@ import ma.youcode.covoiturageapi.trip.entity.Trip;
 import ma.youcode.covoiturageapi.stoppoint.entity.StopPoint;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
-import java.math.RoundingMode;
 
 @Mapper(componentModel = "spring")
 public interface ReservationMapper {
