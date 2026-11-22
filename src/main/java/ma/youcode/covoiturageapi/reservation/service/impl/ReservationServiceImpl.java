@@ -128,4 +128,11 @@ public class ReservationServiceImpl implements ReservationService {
                 .stream().map(reservationMapper::toResponse).toList();
     }
 
+    @Override
+    @Transactional(readOnly = true)
+    public List<ReservationResponseDto> getByDriverId(Long driverId) {
+        return reservationRepository.findByTripDriverIdOrderByReservationDateDesc(driverId)
+                .stream().map(reservationMapper::toResponse).toList();
+    }
+
 }
