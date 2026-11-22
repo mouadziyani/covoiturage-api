@@ -40,4 +40,9 @@ public class ReservationController {
         return ResponseEntity.ok(reservationService.getByDriverId(driverId));
     }
 
+    @PatchMapping("/{reservationId}/cancel")
+    public ResponseEntity<Void> cancel(@PathVariable Long reservationId, @RequestParam Long passagerId) {
+        reservationService.cancel(reservationId, passagerId);
+        return ResponseEntity.noContent().build();
+    }
 }
