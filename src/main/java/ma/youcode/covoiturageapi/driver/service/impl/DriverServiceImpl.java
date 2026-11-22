@@ -10,12 +10,15 @@ import ma.youcode.covoiturageapi.exception.ConflictException;
 import ma.youcode.covoiturageapi.exception.NotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.List;
 
 @Service
 @Transactional
 public class DriverServiceImpl implements DriverService {
+    private static final Logger logger = LoggerFactory.getLogger(DriverServiceImpl.class);
 
     private final DriverRepository driverRepository;
     private final DriverMapper driverMapper;
@@ -29,15 +32,18 @@ public class DriverServiceImpl implements DriverService {
     public DriverResponseDto create(DriverRequestDto request) {
 
         if (driverRepository.existsByEmail(request.email())) {
+            logger.warn("Driver creation rejected: email is already used");
             throw new ConflictException("this email : " + request.email() + " already exist");
         }
 
         if (driverRepository.existsByDrivingLicenseNumber(request.drivingLicenseNumber())) {
+            logger.warn("Driver creation rejected: driving license is already used");
             throw new ConflictException("this drivingLicenseNumber : " + request.drivingLicenseNumber() + " already exist");
         }
 
         Driver driver = driverMapper.toEntity(request);
         Driver createdDriver = driverRepository.save(driver);
+        logger.info("Driver account {} created", createdDriver.getId());
         return driverMapper.toResponse(createdDriver);
     }
 
@@ -62,16 +68,20 @@ public class DriverServiceImpl implements DriverService {
                 .orElseThrow(() -> new NotFoundException("Driver with id : " + id + " not found"));
 
         if (driverRepository.existsByEmailAndIdNot(request.email(),id)) {
+            logger.warn("Driver update rejected: email is already used for driver {}", id);
             throw  new ConflictException("this email : " + request.email() + " already used by other driver");
         }
 
         if (driverRepository.existsByDrivingLicenseNumberAndIdNot(request.drivingLicenseNumber(), id)) {
+            logger.warn("Driver update rejected: driving license is already used for driver {}", id);
             throw  new ConflictException("this Driving License Number : " + request.drivingLicenseNumber() + " already used by other driver");
         }
 
         driverMapper.updateEntity(request, driver);
 
-        return driverMapper.toResponse(driverRepository.save(driver));
+        Driver updatedDriver = driverRepository.save(driver);
+        logger.info("Driver account {} updated", updatedDriver.getId());
+        return driverMapper.toResponse(updatedDriver);
     }
 
     @Override
