@@ -135,4 +135,46 @@ public class ReservationServiceImpl implements ReservationService {
                 .stream().map(reservationMapper::toResponse).toList();
     }
 
+    @Override
+    public void cancel(Long reservationId, Long passagerId) {
+        Reservation reservation = reservationRepository.findById(reservationId)
+                .orElseThrow(() -> new NotFoundException("Reservation not found"));
+        if (!reservation.getPassager().getId().equals(passagerId)) {
+            logger.warn("Reservation cancellation rejected: passenger {} does not own reservation {}",
+                    passagerId, reservationId);
+            throw new ForbiddenActionException("This reservation belongs to another passenger");
+        }
+        if (reservation.getStatus() != StatutReservation.CONFIRMEE) {
+            logger.warn("Reservation cancellation rejected: reservation {} is not confirmed", reservationId);
+            throw new ConflictException("Only confirmed reservations can be cancelled");
+        }
+        Trip trip = tripRepository.findByIdForUpdate(reservation.getTrip().getId())
+                .orElseThrow(() -> new NotFoundException("Trip not found"));
+        if (trip.getDepartureDateTime().isBefore(LocalDateTime.now().plusHours(24))) {
+            logger.warn("Reservation cancellation rejected: reservation {} is within 24 hours of departure",
+                    reservationId);
+            throw new ConflictException("A reservation can only be cancelled at least 24 hours before departure");
+        }
+        reservation.setStatus(StatutReservation.ANNULEE);
+        reservationRepository.save(reservation);
+        logger.info("Reservation {} cancelled by passenger {}", reservationId, passagerId);
+        long seatsAfterCancellation = reservationRepository.sumSeatsByTripAndStatus(
+                trip.getId(), StatutReservation.CONFIRMEE);
+        if (trip.getStatus() != StatutTrajet.TERMINE && trip.getStatus() != StatutTrajet.ANNULE
+                && trip.getProposedSeats() - seatsAfterCancellation > 0) {
+            trip.setStatus(StatutTrajet.PUBLIE);
+            tripRepository.save(trip);
+        }
+    }
+
+    private StopPoint findStopPoint(Long id) {
+        return stopPointRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("Stop point not found"));
+    }
+
+    private void checkStopPointBelongsToTrip(StopPoint stopPoint, Trip trip) {
+        if (stopPoint.getTrip() == null || !stopPoint.getTrip().getId().equals(trip.getId())) {
+            throw new ConflictException("Both stop points must belong to the selected trip");
+        }
+    }
 }
