@@ -118,4 +118,14 @@ public class ReservationServiceImpl implements ReservationService {
         return reservationMapper.toResponse(reservation);
     }
 
+    @Override
+    @Transactional(readOnly = true)
+    public List<ReservationResponseDto> getByPassagerId(Long passagerId) {
+        if (!passagerRepository.existsById(passagerId)) {
+            throw new NotFoundException("Passenger not found");
+        }
+        return reservationRepository.findByPassagerIdOrderByReservationDateDesc(passagerId)
+                .stream().map(reservationMapper::toResponse).toList();
+    }
+
 }
