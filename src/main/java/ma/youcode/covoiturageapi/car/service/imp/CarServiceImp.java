@@ -4,6 +4,7 @@ import ma.youcode.covoiturageapi.driver.entity.Driver;
 import ma.youcode.covoiturageapi.driver.repository.DriverRepository;
 import ma.youcode.covoiturageapi.exception.ConflictException;
 import ma.youcode.covoiturageapi.exception.NotFoundException;
+import ma.youcode.covoiturageapi.trip.repository.TripRepository;
 import ma.youcode.covoiturageapi.car.dto.request.CarRequestDto;
 import ma.youcode.covoiturageapi.car.dto.response.CarResponseDto;
 import ma.youcode.covoiturageapi.car.entity.Car;
@@ -12,25 +13,32 @@ import ma.youcode.covoiturageapi.car.repository.CarRepository;
 import ma.youcode.covoiturageapi.car.service.inter.CarService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.List;
 
 @Service
 @Transactional
 public class CarServiceImp implements CarService {
+    private static final Logger logger = LoggerFactory.getLogger(CarServiceImp.class);
     private final CarRepository carRepository;
     private final CarMapper carMapper;
     private final DriverRepository driverRepository;
+    private final TripRepository tripRepository;
 
-    public CarServiceImp(CarRepository carRepository, DriverRepository driverRepository, CarMapper carMapper) {
+    public CarServiceImp(CarRepository carRepository, DriverRepository driverRepository, CarMapper carMapper,
+                         TripRepository tripRepository) {
         this.carRepository = carRepository;
         this.carMapper = carMapper;
         this.driverRepository = driverRepository;
+        this.tripRepository = tripRepository;
     }
 
     @Override
     public CarResponseDto create(CarRequestDto request) {
         if (carRepository.existsByRegistrationNumber(request.registrationNumber())){
+            logger.warn("Car creation rejected: registration number is already used");
             throw new ConflictException("this registration number : " + request.registrationNumber() + " already exist");
         }
         Driver driver = driverRepository.findById(request.driverId())
@@ -39,6 +47,7 @@ public class CarServiceImp implements CarService {
         Car car = carMapper.toEntity(request);
         car.setDriver(driver);
         Car createCar = carRepository.save(car);
+        logger.info("Car {} created for driver {}", createCar.getId(), driver.getId());
 
         return carMapper.toResponse(createCar);
     }
@@ -64,12 +73,15 @@ public class CarServiceImp implements CarService {
                 .orElseThrow(()->new NotFoundException("Car with id : " + id + " not found"));
 
         if (carRepository.existsByRegistrationNumberAndIdNot(request.registrationNumber(), id)){
+            logger.warn("Car update rejected: registration number is already used for car {}", id);
             throw  new ConflictException("this Registration Number : " + request.registrationNumber() + " already used by other car");
         }
 
         carMapper.updateEntity(request, car);
 
-        return carMapper.toResponse(carRepository.save(car));
+        Car updatedCar = carRepository.save(car);
+        logger.info("Car {} updated", updatedCar.getId());
+        return carMapper.toResponse(updatedCar);
     }
 
     @Override
@@ -87,7 +99,13 @@ public class CarServiceImp implements CarService {
         Car car = carRepository.findById(id)
                 .orElseThrow(()->new NotFoundException("Car with id : " + id + " not found"));
 
+        if (tripRepository.existsByCarId(id)) {
+            logger.warn("Car deletion rejected: car {} is used by a trip", id);
+            throw new ConflictException("Car is used by trips");
+        }
+
         carRepository.delete(car);
+        logger.info("Car {} deleted", id);
 
     }
 }
