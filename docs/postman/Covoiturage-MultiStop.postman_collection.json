@@ -1,0 +1,1367 @@
+{
+  "info": {
+    "name": "Covoiturage - Multi-Stop Carpooling API",
+    "description": "Adaptée aux controllers et DTOs du projet covoiturage-api.\n\n**Ordre (Collection Runner, de haut en bas) :** Drivers → Passengers → Vehicles → Trips → Bookings → Cancel trip. Chaque requête de création sauvegarde son id dans une variable de collection (driverId, passagerId, carId, tripId, stopId1..4, reservationId).\n\nLes champs uniques (email, permis, immatriculation) utilisent un timestamp, et les heures de passage sont calculées dans le pre-request script de la collection (dans 3 jours à 08:00, heure locale).\n\nLes erreurs sont renvoyées en ProblemDetail `{type, title, status, detail, instance, timestamp, path}` : 400 validation, 403 ressource d'un autre, 404 inexistant, 409 règle métier.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "1 - Drivers",
+      "item": [
+        {
+          "name": "Create driver",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/drivers",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "drivers"
+              ]
+            },
+            "description": "Crée un conducteur. Email et numéro de permis uniques. Sauvegarde `driverId`, `driverEmail`, `driverLicense`.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"firstName\": \"Youssef\",\n  \"lastName\": \"Benali\",\n  \"email\": \"driver.{{$timestamp}}@example.com\",\n  \"phoneNumber\": \"0612345678\",\n  \"drivingLicenseNumber\": \"LIC-{{$timestamp}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 201', () => pm.response.to.have.status(201));",
+                  "const j = pm.response.json();",
+                  "pm.collectionVariables.set('driverId', j.id);",
+                  "pm.collectionVariables.set('driverLastName', j.lastName);",
+                  "pm.collectionVariables.set('driverEmail', j.email);",
+                  "pm.collectionVariables.set('driverLicense', j.drivingLicenseNumber);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get all drivers",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/drivers",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "drivers"
+              ]
+            },
+            "description": "Liste tous les conducteurs."
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 200', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get driver by id",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/drivers/{{driverId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "drivers",
+                "{{driverId}}"
+              ]
+            },
+            "description": "Retourne un conducteur."
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 200', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Update driver",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/drivers/{{driverId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "drivers",
+                "{{driverId}}"
+              ]
+            },
+            "description": "Mise à jour complète : tous les champs sont obligatoires (on renvoie le même email et permis).",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"firstName\": \"Youssef\",\n  \"lastName\": \"Benali\",\n  \"email\": \"{{driverEmail}}\",\n  \"phoneNumber\": \"0698765432\",\n  \"drivingLicenseNumber\": \"{{driverLicense}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 200', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Search drivers",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/drivers/search?word={{driverLastName}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "drivers",
+                "search"
+              ],
+              "query": [
+                {
+                  "key": "word",
+                  "value": "{{driverLastName}}"
+                }
+              ]
+            },
+            "description": "Recherche par nom, prénom ou email (`word`)."
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 200', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get trips of a driver",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/drivers/{{driverId}}/trips",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "drivers",
+                "{{driverId}}",
+                "trips"
+              ]
+            },
+            "description": "Trajets publiés par le conducteur."
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 200', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "2 - Passengers",
+      "item": [
+        {
+          "name": "Create passenger",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/passagers",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "passagers"
+              ]
+            },
+            "description": "Crée un passager (email unique). Sauvegarde `passagerId` et `passagerEmail`.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"firstName\": \"Sara\",\n  \"lastName\": \"El Amrani\",\n  \"email\": \"passenger.{{$timestamp}}@example.com\",\n  \"phoneNumber\": \"0655443322\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 201', () => pm.response.to.have.status(201));",
+                  "const j = pm.response.json();",
+                  "pm.collectionVariables.set('passagerId', j.id);",
+                  "pm.collectionVariables.set('passagerEmail', j.email);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get all passengers",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/passagers",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "passagers"
+              ]
+            },
+            "description": "Liste tous les passagers."
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 200', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get passenger by id",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/passagers/{{passagerId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "passagers",
+                "{{passagerId}}"
+              ]
+            },
+            "description": "Retourne un passager."
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 200', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Update passenger",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/passagers/{{passagerId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "passagers",
+                "{{passagerId}}"
+              ]
+            },
+            "description": "Mise à jour complète : tous les champs sont obligatoires.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"firstName\": \"Sara\",\n  \"lastName\": \"El Amrani\",\n  \"email\": \"{{passagerEmail}}\",\n  \"phoneNumber\": \"0677889900\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 200', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Search passenger by email",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/passagers/search?email={{passagerEmail}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "passagers",
+                "search"
+              ],
+              "query": [
+                {
+                  "key": "email",
+                  "value": "{{passagerEmail}}"
+                }
+              ]
+            },
+            "description": "Recherche exacte par email."
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 200', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "3 - Vehicles",
+      "item": [
+        {
+          "name": "Add vehicle",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/vehicules",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "vehicules"
+              ]
+            },
+            "description": "Ajoute un véhicule à un conducteur. `size` entre 1 et 8, immatriculation unique. Sauvegarde `carId`.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"brand\": \"Dacia\",\n  \"model\": \"Logan\",\n  \"registrationNumber\": \"{{carReg}}\",\n  \"color\": \"White\",\n  \"size\": 4,\n  \"driverId\": {{driverId}}\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.collectionVariables.set('carReg', 'REG-' + Date.now());"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 201', () => pm.response.to.have.status(201));",
+                  "pm.collectionVariables.set('carId', pm.response.json().id);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get vehicle by id",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/vehicules/{{carId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "vehicules",
+                "{{carId}}"
+              ]
+            },
+            "description": "Retourne un véhicule."
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 200', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get vehicles of a driver",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/vehicules/drivers/{{driverId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "vehicules",
+                "drivers",
+                "{{driverId}}"
+              ]
+            },
+            "description": "Liste les véhicules d'un conducteur."
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 200', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Edit vehicle",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/vehicules/{{carId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "vehicules",
+                "{{carId}}"
+              ]
+            },
+            "description": "Mise à jour complète (même immatriculation).",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"brand\": \"Dacia\",\n  \"model\": \"Logan MCV\",\n  \"registrationNumber\": \"{{carReg}}\",\n  \"color\": \"Grey\",\n  \"size\": 4,\n  \"driverId\": {{driverId}}\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 200', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Add spare vehicle",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/vehicules",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "vehicules"
+              ]
+            },
+            "description": "Véhicule de rechange, sans trajet, pour tester la suppression.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"brand\": \"Renault\",\n  \"model\": \"Clio\",\n  \"registrationNumber\": \"SPARE-{{$timestamp}}\",\n  \"color\": \"Blue\",\n  \"size\": 4,\n  \"driverId\": {{driverId}}\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 201', () => pm.response.to.have.status(201));",
+                  "pm.collectionVariables.set('spareCarId', pm.response.json().id);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Delete vehicle (spare)",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/vehicules/{{spareCarId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "vehicules",
+                "{{spareCarId}}"
+              ]
+            },
+            "description": "Supprime un véhicule qui n'est associé à aucun trajet → 204."
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 204', () => pm.response.to.have.status(204));"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "4 - Trips",
+      "item": [
+        {
+          "name": "Publish trip",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/trips",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "trips"
+              ]
+            },
+            "description": "Publie un trajet multi-étapes. Règles : au moins 2 points, villes uniques, prix du 1er point = 0, heures et prix strictement croissants, départ dans le futur, `proposedSeats` <= capacité, véhicule du conducteur. Sauvegarde `tripId` et `stopId1`..`stopId4` (ordre du parcours).",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"driverId\": {{driverId}},\n  \"carId\": {{carId}},\n  \"proposedSeats\": 3,\n  \"stopPoints\": [\n    {\n      \"city\": \"Casablanca\",\n      \"stopOrder\": 0,\n      \"passageTime\": \"{{stop1}}\",\n      \"priceFromDeparture\": 0\n    },\n    {\n      \"city\": \"Rabat\",\n      \"stopOrder\": 1,\n      \"passageTime\": \"{{stop2}}\",\n      \"priceFromDeparture\": 40\n    },\n    {\n      \"city\": \"Kenitra\",\n      \"stopOrder\": 2,\n      \"passageTime\": \"{{stop3}}\",\n      \"priceFromDeparture\": 65\n    },\n    {\n      \"city\": \"Tangier\",\n      \"stopOrder\": 3,\n      \"passageTime\": \"{{stop4}}\",\n      \"priceFromDeparture\": 120\n    }\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 201', () => pm.response.to.have.status(201));",
+                  "const j = pm.response.json();",
+                  "pm.collectionVariables.set('tripId', j.id);",
+                  "(j.stopPoints || []).forEach((s, i) => pm.collectionVariables.set('stopId' + (i + 1), s.id));",
+                  "pm.test('Trip is PUBLIE', () => pm.expect(j.status).to.eql('PUBLIE'));",
+                  "pm.test('3 remaining seats', () => pm.expect(j.remainingSeats).to.eql(3));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get trip by id",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/trips/{{tripId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "trips",
+                "{{tripId}}"
+              ]
+            },
+            "description": "Détail du trajet : parcours, places restantes (`remainingSeats`), conducteur."
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 200', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get stop points of a trip",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/stop-points/trip/{{tripId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "stop-points",
+                "trip",
+                "{{tripId}}"
+              ]
+            },
+            "description": "Points d'arrêt triés par ordre."
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 200', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Search trips",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/trips/search?departureCity=Casablanca&arrivalCity=Tangier&date={{searchDate}}&seats=1&maxPrice=150&page=0&size=10",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "trips",
+                "search"
+              ],
+              "query": [
+                {
+                  "key": "departureCity",
+                  "value": "Casablanca"
+                },
+                {
+                  "key": "arrivalCity",
+                  "value": "Tangier"
+                },
+                {
+                  "key": "date",
+                  "value": "{{searchDate}}"
+                },
+                {
+                  "key": "seats",
+                  "value": "1"
+                },
+                {
+                  "key": "maxPrice",
+                  "value": "150"
+                },
+                {
+                  "key": "page",
+                  "value": "0"
+                },
+                {
+                  "key": "size",
+                  "value": "10"
+                }
+              ]
+            },
+            "description": "Recherche par villes (n'importe quels points du parcours, dans le bon sens), date, places, prix max du segment. Paginé."
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Trip found, segment price 120', () => {",
+                  "    const t = pm.response.json().content.find(r => r.tripId === Number(pm.collectionVariables.get('tripId')));",
+                  "    pm.expect(t).to.not.be.undefined;",
+                  "    pm.expect(Number(t.segmentPrice)).to.eql(120);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Search trips (wrong direction → not found)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/trips/search?departureCity=Tangier&arrivalCity=Rabat&date={{searchDate}}&page=0&size=10",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "trips",
+                "search"
+              ],
+              "query": [
+                {
+                  "key": "departureCity",
+                  "value": "Tangier"
+                },
+                {
+                  "key": "arrivalCity",
+                  "value": "Rabat"
+                },
+                {
+                  "key": "date",
+                  "value": "{{searchDate}}"
+                },
+                {
+                  "key": "page",
+                  "value": "0"
+                },
+                {
+                  "key": "size",
+                  "value": "10"
+                }
+              ]
+            },
+            "description": "Tangier → Rabat est dans le mauvais sens : le trajet ne doit pas apparaître."
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Trip not in results', () => {",
+                  "    const ids = pm.response.json().content.map(r => r.tripId);",
+                  "    pm.expect(ids).to.not.include(Number(pm.collectionVariables.get('tripId')));",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Finish trip (before departure → 409)",
+          "request": {
+            "method": "PATCH",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/trips/{{tripId}}/complete?driverId={{driverId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "trips",
+                "{{tripId}}",
+                "complete"
+              ],
+              "query": [
+                {
+                  "key": "driverId",
+                  "value": "{{driverId}}"
+                }
+              ]
+            },
+            "description": "Terminer un trajet : seulement par son conducteur et APRÈS l'heure de départ. Sur un trajet qui vient d'être publié → 409."
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 409', () => pm.response.to.have.status(409));"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "5 - Bookings",
+      "item": [
+        {
+          "name": "Create booking",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/reservations",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "reservations"
+              ]
+            },
+            "description": "Réserve un segment (Rabat → Tangier). Prix = (120 − 40) × 1 = 80 DH. Sauvegarde `reservationId`.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"passagerId\": {{passagerId}},\n  \"tripId\": {{tripId}},\n  \"boardingStopPointId\": {{stopId2}},\n  \"alightingStopPointId\": {{stopId4}},\n  \"numberOfSeats\": 1\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 201', () => pm.response.to.have.status(201));",
+                  "const j = pm.response.json();",
+                  "pm.collectionVariables.set('reservationId', j.id);",
+                  "pm.test('Booking is CONFIRMEE', () => pm.expect(j.status).to.eql('CONFIRMEE'));",
+                  "pm.test('Amount is 80', () => pm.expect(Number(j.totalAmount)).to.eql(80));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get booking by id",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/reservations/{{reservationId}}?passagerId={{passagerId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "reservations",
+                "{{reservationId}}"
+              ],
+              "query": [
+                {
+                  "key": "passagerId",
+                  "value": "{{passagerId}}"
+                }
+              ]
+            },
+            "description": "Seul le passager propriétaire peut la consulter (sinon 403)."
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 200', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get bookings of driver's trips",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/reservations/driver/{{driverId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "reservations",
+                "driver",
+                "{{driverId}}"
+              ]
+            },
+            "description": "Réservations sur les trajets du conducteur."
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 200', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get bookings of a passenger",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/reservations/passager/{{passagerId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "reservations",
+                "passager",
+                "{{passagerId}}"
+              ]
+            },
+            "description": "Historique des réservations du passager."
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 200', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Cancel booking",
+          "request": {
+            "method": "PATCH",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/reservations/{{reservationId}}/cancel?passagerId={{passagerId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "reservations",
+                "{{reservationId}}",
+                "cancel"
+              ],
+              "query": [
+                {
+                  "key": "passagerId",
+                  "value": "{{passagerId}}"
+                }
+              ]
+            },
+            "description": "Annule une réservation : seulement le passager propriétaire, au moins 24h avant le départ → 204."
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 204', () => pm.response.to.have.status(204));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Check booking is ANNULEE",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/reservations/{{reservationId}}?passagerId={{passagerId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "reservations",
+                "{{reservationId}}"
+              ],
+              "query": [
+                {
+                  "key": "passagerId",
+                  "value": "{{passagerId}}"
+                }
+              ]
+            },
+            "description": "Vérifie le statut après annulation."
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Booking is ANNULEE', () => pm.expect(pm.response.json().status).to.eql('ANNULEE'));"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "6 - Cancel trip",
+      "item": [
+        {
+          "name": "Cancel trip",
+          "request": {
+            "method": "PATCH",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/trips/{{tripId}}/cancel?driverId={{driverId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "trips",
+                "{{tripId}}",
+                "cancel"
+              ],
+              "query": [
+                {
+                  "key": "driverId",
+                  "value": "{{driverId}}"
+                }
+              ]
+            },
+            "description": "Annule le trajet (ANNULE) et toutes ses réservations CONFIRMEE. Seulement le conducteur propriétaire, seulement un trajet PUBLIE ou COMPLET → 204. À lancer en dernier."
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 204', () => pm.response.to.have.status(204));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Check trip is ANNULE",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/trips/{{tripId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "trips",
+                "{{tripId}}"
+              ]
+            },
+            "description": "Vérifie le statut du trajet."
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Trip is ANNULE', () => pm.expect(pm.response.json().status).to.eql('ANNULE'));"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          "// Heures de passage futures et strictement croissantes (format LocalDateTime, heure locale).",
+          "const pad = n => String(n).padStart(2, '0');",
+          "const fmt = d => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}:00`;",
+          "const base = new Date();",
+          "base.setDate(base.getDate() + 3);",
+          "base.setHours(8, 0, 0, 0);",
+          "const at = h => fmt(new Date(base.getTime() + h * 3600 * 1000));",
+          "pm.collectionVariables.set('stop1', at(0));",
+          "pm.collectionVariables.set('stop2', at(1.5));",
+          "pm.collectionVariables.set('stop3', at(2.5));",
+          "pm.collectionVariables.set('stop4', at(4.5));",
+          "pm.collectionVariables.set('searchDate', fmt(base).substring(0, 10));"
+        ]
+      }
+    }
+  ],
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:8080"
+    },
+    {
+      "key": "driverId",
+      "value": ""
+    },
+    {
+      "key": "driverLastName",
+      "value": "Benali"
+    },
+    {
+      "key": "driverEmail",
+      "value": ""
+    },
+    {
+      "key": "driverLicense",
+      "value": ""
+    },
+    {
+      "key": "passagerId",
+      "value": ""
+    },
+    {
+      "key": "passagerEmail",
+      "value": ""
+    },
+    {
+      "key": "carId",
+      "value": ""
+    },
+    {
+      "key": "carReg",
+      "value": ""
+    },
+    {
+      "key": "spareCarId",
+      "value": ""
+    },
+    {
+      "key": "tripId",
+      "value": ""
+    },
+    {
+      "key": "stopId1",
+      "value": ""
+    },
+    {
+      "key": "stopId2",
+      "value": ""
+    },
+    {
+      "key": "stopId3",
+      "value": ""
+    },
+    {
+      "key": "stopId4",
+      "value": ""
+    },
+    {
+      "key": "reservationId",
+      "value": ""
+    },
+    {
+      "key": "stop1",
+      "value": ""
+    },
+    {
+      "key": "stop2",
+      "value": ""
+    },
+    {
+      "key": "stop3",
+      "value": ""
+    },
+    {
+      "key": "stop4",
+      "value": ""
+    },
+    {
+      "key": "searchDate",
+      "value": ""
+    }
+  ]
+}
