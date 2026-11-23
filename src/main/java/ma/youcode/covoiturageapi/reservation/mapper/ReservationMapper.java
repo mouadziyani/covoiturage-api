@@ -9,7 +9,10 @@ import ma.youcode.covoiturageapi.stoppoint.entity.StopPoint;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
-@Mapper(componentModel = "spring")
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+
+@Mapper(componentModel = "spring", imports = RoundingMode.class)
 public interface ReservationMapper {
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "reservationDate", ignore = true)
@@ -21,8 +24,7 @@ public interface ReservationMapper {
     @Mapping(target = "numberOfSeats", source = "request.numberOfSeats")
     @Mapping(target = "totalAmount", expression = "java(totalAmount.setScale(2, RoundingMode.HALF_UP))")
     Reservation toEntity(ReservationRequestDto request, Passager passager, Trip trip,
-                         StopPoint boarding, StopPoint destination, java.math.BigDecimal totalAmount);
-
+                         StopPoint boarding, StopPoint destination, BigDecimal totalAmount);
     @Mapping(target = "passagerId", source = "passager.id")
     @Mapping(target = "tripId", source = "trip.id")
     @Mapping(target = "boardingStopPointId", source = "boardingStopPoint.id")

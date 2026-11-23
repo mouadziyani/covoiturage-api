@@ -11,16 +11,25 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.math.BigDecimal;
+
 import jakarta.persistence.LockModeType;
 import org.springframework.data.jpa.repository.Lock;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+
 import java.util.Optional;
 
 public interface TripRepository extends JpaRepository<Trip, Long> {
     @Lock(LockModeType.PESSIMISTIC_WRITE)
     @Query("select t from Trip t where t.id = :tripId")
     Optional<Trip> findByIdForUpdate(@Param("tripId") Long tripId);
+
+    @Query("select t from Trip t " +
+            "join fetch t.driver " +
+            "join fetch t.car " +
+            "left join fetch t.stopPoints " +
+            "where t.id = :id")
+    Optional<Trip> findDetailById(@Param("id") Long id);
 
     List<Trip> findByCarId(Long carId);
 
