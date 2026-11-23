@@ -58,6 +58,10 @@ public class ReservationServiceImpl implements ReservationService {
             logger.warn("Reservation rejected: trip {} is not published", trip.getId());
             throw new ConflictException("Only published trips can be reserved");
         }
+        if (!trip.getDepartureDateTime().isAfter(LocalDateTime.now())) {
+            logger.warn("Reservation rejected: trip {} has already departed", trip.getId());
+            throw new ConflictException("A trip that has already departed cannot be reserved");
+        }
         StopPoint boarding = findStopPoint(request.boardingStopPointId());
         StopPoint destination = findStopPoint(request.alightingStopPointId());
         checkStopPointBelongsToTrip(boarding, trip);

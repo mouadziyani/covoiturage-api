@@ -64,7 +64,7 @@ public class TripServiceImp implements TripService {
         if (request.proposedSeats() > car.getSize()) {
             logger.warn("Trip creation rejected: {} seats exceed car {} capacity {}",
                     request.proposedSeats(), car.getId(), car.getSize());
-            throw new InvalidRequestException("Proposed seats cannot exceed car capacity");
+            throw new InvalidRequestException("4 places au maximum");
         }
         validateStopPoints(request);
         Trip trip = tripMapper.toEntity(request);
@@ -104,7 +104,7 @@ public class TripServiceImp implements TripService {
         if (request.proposedSeats() > car.getSize()) {
             logger.warn("Trip update rejected: {} seats exceed car {} capacity {}",
                     request.proposedSeats(), car.getId(), car.getSize());
-            throw new InvalidRequestException("Proposed seats cannot exceed car capacity");
+            throw new InvalidRequestException("4 places au maximum");
         }
         validateStopPoints(request);
 
@@ -226,6 +226,10 @@ public class TripServiceImp implements TripService {
         BigDecimal previousPrice = null;
         for (int i = 0; i < request.stopPoints().size(); i++) {
             var stop = request.stopPoints().get(i);
+            if (i == 0 && stop.stopOrder() != 0) {
+                logger.warn("Trip rejected: first stop order must be zero");
+                throw new InvalidRequestException("The first stop order must be 0");
+            }
             String city = stop.city().trim();
             if (cities.contains(city.toLowerCase(Locale.ROOT))) {
                 logger.warn("Trip rejected: city {} appears more than once", city);

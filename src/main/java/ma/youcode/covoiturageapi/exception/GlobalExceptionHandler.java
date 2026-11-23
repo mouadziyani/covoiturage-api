@@ -9,6 +9,7 @@ import org.springframework.web.method.annotation.MethodArgumentTypeMismatchExcep
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 import java.net.URI;
 import java.time.Instant;
@@ -62,6 +63,11 @@ public class GlobalExceptionHandler {
                                             HttpServletRequest request) {
         return build(HttpStatus.BAD_REQUEST, "invalid-parameter",
                 "Invalid value for parameter: " + exception.getName(), request);
+    }
+
+    @ExceptionHandler(NoResourceFoundException.class)
+    public ProblemDetail handleNoResourceFound(NoResourceFoundException exception, HttpServletRequest request) {
+        return build(HttpStatus.NOT_FOUND, "not-found", "Resource not found", request);
     }
 
     @ExceptionHandler(Exception.class)
